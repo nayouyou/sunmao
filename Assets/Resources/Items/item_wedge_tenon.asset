@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9446f177c76be25498ec9c9491bdd4e4, type: 3}
-  m_Name: item_dougong
+  m_Name: item_wedge_tenon
   m_EditorClassIdentifier: 
-  itemTitle: "\u6597\u62F1"
-  itemDescription: 
+  itemTitle: "\u6954\u9489\u69AB"
+  itemDescription: "\u4E24\u7247\u534A\u69AB\u5BF9\u63D2\u540E\u4EE5\u6728\u6954\u8D2F\u9489\u9501\u5B9A\uFF0C\u63A5\u5408\u7D27\u5BC6\u4E0D\u6613\u8131\u51FA\uFF0C\u5E38\u7528\u4E8E\u5706\u6750\u63A5\u957F\u4E0E\u5F27\u5F62\u6784\u4EF6\u3002"
   itemSprite: {fileID: 0}
-  itemVideo: {fileID: 0}
+  itemVideo: {fileID: 32900000, guid: d5008e5fb69ece745b983a7b2d3420bf, type: 3}
   autoPlay: 1
-  partKey: dougong
+  partKey: wedge_tenon

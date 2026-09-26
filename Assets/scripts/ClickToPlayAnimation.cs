@@ -22,6 +22,14 @@ public class ClickToPlayAnimation : MonoBehaviour
     [Tooltip("视频循环播放次数，默认1次")]
     public int playTimes = 1;
 
+    [Header("额外获得的物品（可为空）")]
+    [Tooltip("组装完成后与 itemData 一起放入背包并存档")]
+    public ItemData[] additionalItems;
+
+    [Header("无组装视频时显示的静态图（可为空）")]
+    [Tooltip("videoClip 为空时，在组装面板显示这张图，按 Esc 关闭即完成组装")]
+    public Texture assemblyStillImage;
+
     [Header("前置条件（需已组装完成的物品）")]
     [Tooltip("缺任意一项时点击只提示，不进入组装流程；留空表示无前置条件")]
     public ItemData[] requiredItems;
@@ -50,6 +58,13 @@ public class ClickToPlayAnimation : MonoBehaviour
     private bool _isAssembled = false;
     private bool _requirementsMet = true;
     private bool _isObtainedTipShowing = false;
+    private bool _isShowingStill = false;
+
+    /// <summary>
+    /// 当前正在显示静态组装图的实例。场景里多个同类实例共享同一块组装面板，
+    /// 关闭时只允许归属者处理，避免其他实例抢先关闭并误完成
+    /// </summary>
+    private static ClickToPlayAnimation _stillImageOwner;
     private ItemData _pendingUnlockNotify;
     private bool _isDialogShowing = false;
     private int _currentPlayCount = 0;
@@ -72,9 +87,20 @@ public class ClickToPlayAnimation : MonoBehaviour
             transform.localScale = assembledScale;
             _isAssembled = true;
 
-            // 存档恢复：已组装零件的物品重新放入背包（AddItemToBag内部按引用去重）
-            if (itemData != null && BagShowVideoManager.Instance != null)
-                BagShowVideoManager.Instance.AddItemToBag(itemData);
+            // 存档恢复：已组装零件的物品重新放入背包（主物品 + 额外物品，AddItemToBag内部按引用去重）
+            if (BagShowVideoManager.Instance != null)
+            {
+                if (itemData != null)
+                    BagShowVideoManager.Instance.AddItemToBag(itemData);
+                if (additionalItems != null)
+                {
+                    foreach (ItemData extra in additionalItems)
+                    {
+                        if (extra != null)
+                            BagShowVideoManager.Instance.AddItemToBag(extra);
+                    }
+                }
+            }
         }
         else
         {
@@ -136,7 +162,21 @@ public class ClickToPlayAnimation : MonoBehaviour
         // 视频面板关闭快捷键
         if (videoPanel.activeSelf && Input.GetKeyDown(GameKeys.ClosePanel))
         {
-            CloseVideo();
+            // 无组装视频的物件为静态图模式
+            bool isStillMode = (videoClip == null && assemblyStillImage != null);
+            if (isStillMode)
+            {
+                // 只有开启静态图的实例才处理关闭，避免场景里其他同类实例抢先关闭并误完成
+                if (_stillImageOwner == this)
+                {
+                    HideStillImage();
+                    CompleteAssembly();
+                }
+            }
+            else
+            {
+                CloseVideo();
+            }
         }
     }
 
@@ -237,8 +277,27 @@ public class ClickToPlayAnimation : MonoBehaviour
         dialogBox.SetActive(true);
         Canvas.ForceUpdateCanvases();
 
-        string itemName = item != null ? item.itemTitle : "";
-        dialogTipText.text = string.Format(obtainedDialogText, itemName);
+        dialogTipText.text = string.Format(obtainedDialogText, BuildObtainedItemNames(item));
+    }
+
+    /// <summary>
+    /// 拼装本次获得的物品名称（主物品 + 额外物品），用于"已知晓"对话
+    /// 获得两个物品时显示两个名字，例如：霸王枨、粽角榫
+    /// </summary>
+    string BuildObtainedItemNames(ItemData main)
+    {
+        List<string> names = new List<string>();
+        if (main != null)
+            names.Add(main.itemTitle);
+        if (additionalItems != null)
+        {
+            foreach (ItemData extra in additionalItems)
+            {
+                if (extra != null)
+                    names.Add(extra.itemTitle);
+            }
+        }
+        return string.Join("、", names);
     }
 
     /// <summary>
@@ -251,14 +310,16 @@ public class ClickToPlayAnimation : MonoBehaviour
             Debug.LogError($"{gameObject.name}：视频面板UI缺失");
             return;
         }
+        // 没有组装视频时，用静态图代替（如椅子）
         if (videoClip == null)
         {
-            Debug.LogError($"{gameObject.name}：未赋值组装视频");
+            ShowStillImage();
             return;
         }
 
         _currentPlayCount = 0;
         videoPanel.SetActive(true);
+        videoRawImage.gameObject.SetActive(true);   // 画面区是全局共享对象，确保处于启用状态
         Canvas.ForceUpdateCanvases();
 
         // 自动重建适配尺寸渲染纹理
@@ -300,6 +361,83 @@ public class ClickToPlayAnimation : MonoBehaviour
     }
 
     /// <summary>
+    /// 显示静态组装图（无组装视频的物件用），按 Esc 关闭后完成组装
+    /// </summary>
+    void ShowStillImage()
+    {
+        if (assemblyStillImage == null)
+        {
+            Debug.LogError($"{gameObject.name}：未赋值组装视频且无静态图");
+            return;
+        }
+        if (videoPanel == null || videoRawImage == null)
+        {
+            Debug.LogError($"{gameObject.name}：视频面板UI缺失");
+            return;
+        }
+
+        _stillImageOwner = this;
+        _isShowingStill = true;
+        videoPanel.SetActive(true);
+        Canvas.ForceUpdateCanvases();
+        videoRawImage.gameObject.SetActive(true);
+        videoRawImage.texture = assemblyStillImage;
+    }
+
+    /// <summary>
+    /// 关闭静态组装图
+    /// </summary>
+    void HideStillImage()
+    {
+        _isShowingStill = false;
+        if (_stillImageOwner == this)
+            _stillImageOwner = null;
+        if (videoRawImage != null)
+        {
+            // 只清纹理，不要禁用这个全局共享的画面区，否则之后所有视频都看不到
+            videoRawImage.texture = null;
+        }
+        if (videoPanel != null)
+            videoPanel.SetActive(false);
+    }
+
+    /// <summary>
+    /// 发放本次组装获得的物品（主物品 + 额外物品），并写入存档
+    /// </summary>
+    void GrantItems()
+    {
+        GrantOne(itemData);
+        if (additionalItems != null)
+        {
+            foreach (ItemData extra in additionalItems)
+            {
+                GrantOne(extra);
+            }
+        }
+    }
+
+    void GrantOne(ItemData it)
+    {
+        if (it == null)
+        {
+            Debug.LogError($"{gameObject.name}：物品配置为空，跳过");
+            return;
+        }
+        if (!GameGlobalData.Instance.IsPartFinished(it.partKey))
+        {
+            GameGlobalData.Instance.SetPartFinished(it.partKey);
+        }
+        if (BagShowVideoManager.Instance != null)
+        {
+            BagShowVideoManager.Instance.AddItemToBag(it);
+        }
+        else
+        {
+            Debug.LogError("BagShowVideoManager单例为空，无法存入物品");
+        }
+    }
+
+    /// <summary>
     /// 视频播放完毕回调：组装完成、存档、新增物品至背包
     /// </summary>
     void OnVideoEnd(VideoPlayer vp)
@@ -312,7 +450,15 @@ public class ClickToPlayAnimation : MonoBehaviour
             return;
         }
         CloseVideo();
+        CompleteAssembly();
+    }
 
+    /// <summary>
+    /// 组装完成：发放物品、弹"已知晓"提示、更新外观、收起感叹号
+    /// 视频结束与静态图关闭都走这里
+    /// </summary>
+    void CompleteAssembly()
+    {
         // 仅首次组装执行新增物品逻辑
         if (!_isAssembled)
         {
@@ -321,21 +467,10 @@ public class ClickToPlayAnimation : MonoBehaviour
                 GameGlobalData.Instance.SetPartFinished(partKey);
 
                 // 传递完整ItemData给背包管理器
-                if (itemData == null)
+                GrantItems();
+                if (HintManager.Instance != null)
                 {
-                    Debug.LogError($"{gameObject.name} 未拖拽赋值 ItemData");
-                }
-                else if (BagShowVideoManager.Instance == null)
-                {
-                    Debug.LogError("BagShowVideoManager单例为空，无法存入物品");
-                }
-                else
-                {
-                    BagShowVideoManager.Instance.AddItemToBag(itemData);
-                    if (HintManager.Instance != null)
-                    {
-                        HintManager.Instance.ShowHint("已解锁物品，按Tab打开背包查看");
-                    }
+                    HintManager.Instance.ShowHint("已解锁物品，按Tab打开背包查看");
                 }
             }
 

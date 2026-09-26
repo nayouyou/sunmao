@@ -63,6 +63,36 @@ public class BagShowVideoManager : MonoBehaviour
         InitBagSlots();
     }
 
+    private void Start()
+    {
+        RestoreBagFromSave();
+    }
+
+    /// <summary>
+    /// 按存档 finishedParts 全局恢复背包（不依赖当前场景里有哪些构件）
+    /// 物品资产位于 Resources/Items，运行时可全部加载后按 partKey 匹配
+    /// AddItemToBag 内部按引用去重，与构件自身的恢复逻辑不会重复
+    /// </summary>
+    void RestoreBagFromSave()
+    {
+        GameSaveData data = SaveSystem.Load();
+        if (data == null || data.finishedParts == null) return;
+
+        ItemData[] allItems = Resources.LoadAll<ItemData>("Items");
+        if (allItems == null || allItems.Length == 0)
+        {
+            Debug.LogWarning("RestoreBagFromSave：Resources/Items 下没有找到物品资产");
+            return;
+        }
+
+        foreach (ItemData item in allItems)
+        {
+            if (item == null || string.IsNullOrEmpty(item.partKey)) continue;
+            if (data.finishedParts.Contains(item.partKey))
+                AddItemToBag(item);
+        }
+    }
+
     private void Update()
     {
         // Tab键切换背包显隐

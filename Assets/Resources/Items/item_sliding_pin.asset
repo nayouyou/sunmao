@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9446f177c76be25498ec9c9491bdd4e4, type: 3}
+  m_Name: item_sliding_pin
+  m_EditorClassIdentifier: 
+  itemTitle: "\u8D70\u9A6C\u9500"
+  itemDescription: "\u53EF\u62C6\u5378\u7684\u6D3B\u52A8\u69AB\u536F\uFF0C\u69AB\u5934\u63A8\u5165\u540E\u81EA\u9501\uFF0C\u53CD\u5411\u9000\u51FA\u5373\u53EF\u62C6\u4E0B\uFF0C\u591A\u7528\u4E8E\u9700\u8981\u62C6\u88C5\u7684\u684C\u6848\u4E0E\u67B6\u5B50\u3002"
+  itemSprite: {fileID: 0}
+  itemVideo: {fileID: 32900000, guid: 482a043ef4428354b9551429f46796b0, type: 3}
+  autoPlay: 1
+  partKey: sliding_pin

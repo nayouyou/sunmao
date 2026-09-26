@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9446f177c76be25498ec9c9491bdd4e4, type: 3}
+  m_Name: item_curved_brace_tenon
+  m_EditorClassIdentifier: 
+  itemTitle: "\u9738\u738B\u67A8"
+  itemDescription: "\u9738\u738B\u67A8\u662F\u8FDE\u63A5\u817F\u8DB3\u4E0E\u684C\u9762\u7684\u659C\u6491\u6784\u4EF6\uFF0C\u4EE5\u94A9\u6302\u65B9\u5F0F\u627F\u6258\u684C\u9762\uFF0C\u65E2\u52A0\u56FA\u7ED3\u6784\u53C8\u4E0D\u906E\u6321\u817F\u90E8\u7A7A\u95F4\uFF0C\u662F\u660E\u5F0F\u5BB6\u5177\u7684\u7ECF\u5178\u505A\u6CD5\u3002"
+  itemSprite: {fileID: 0}
+  itemVideo: {fileID: 32900000, guid: 2d72918011358414d8e68a9ca996c62c, type: 3}
+  autoPlay: 1
+  partKey: curved_brace_tenon

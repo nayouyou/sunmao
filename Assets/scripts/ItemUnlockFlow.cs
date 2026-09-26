@@ -89,14 +89,11 @@ public class ItemUnlockFlow : MonoBehaviour
     {
         if (!_isDialogShowing) return;
 
-        if (Input.GetKeyDown(GameKeys.DialogConfirm))
+        // 获得斗拱的对话是事件提示（不是可选操作），Q / E 均视为继续
+        if (Input.GetKeyDown(GameKeys.DialogConfirm) || Input.GetKeyDown(GameKeys.DialogCancel))
         {
             HideDialog();
             StartUnlock();
-        }
-        else if (Input.GetKeyDown(GameKeys.DialogCancel))
-        {
-            HideDialog();
         }
     }
 
@@ -155,6 +152,7 @@ public class ItemUnlockFlow : MonoBehaviour
 
         _isPlayingVideo = true;
         _videoPanel.SetActive(true);
+        _videoRawImage.gameObject.SetActive(true);   // 画面区是全局共享对象，确保处于启用状态
         Canvas.ForceUpdateCanvases();
         _videoRawImage.texture = _renderTexture;
         _videoPlayer.targetTexture = _renderTexture;

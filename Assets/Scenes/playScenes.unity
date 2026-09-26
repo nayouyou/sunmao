@@ -2089,6 +2089,8 @@ MonoBehaviour:
   partKey: 1
   videoClip: {fileID: 32900000, guid: b77191fd6526b2c4ca87cb362b4257ed, type: 3}
   playTimes: 1
+  additionalItems: []
+  assemblyStillImage: {fileID: 0}
   requiredItems: []
   originalSprite: {fileID: 21300000, guid: 4c13a57fb96814449920049a9eab5f5d, type: 3}
   assembledSprite: {fileID: 21300000, guid: 668b03b53fa109c44900c47439eb8e4f, type: 3}
@@ -6726,10 +6728,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ce086185f5bf5b438f55db009f447be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  requiredItems: []
+  requiredItems:
+  - {fileID: 11400000, guid: 04e120a2149a3264fad9593950087cc3, type: 2}
+  - {fileID: 11400000, guid: ec5e61b920f807e45b21a4e08c738ced, type: 2}
+  - {fileID: 11400000, guid: 536a8dcaea3c5ed4e9b39e795d307717, type: 2}
+  - {fileID: 11400000, guid: b7a97af9fb712254eb037b17303e4f77, type: 2}
+  - {fileID: 11400000, guid: 24509c2a43a055f46a68ac522ef1d33a, type: 2}
+  - {fileID: 11400000, guid: 0a0f64a7612013d4faa9b592199ab48d, type: 2}
+  - {fileID: 11400000, guid: e99a10ce2af16ea42961e2ea376f786e, type: 2}
+  - {fileID: 11400000, guid: 3179e97cf9ed7374c92e7e1f66cea43a, type: 2}
   unlockItem: {fileID: 11400000, guid: 4ce509a36207d914ba4577d2b7122ad2, type: 2}
-  unlockVideo: {fileID: 0}
-  dialogText: 
+  unlockVideo: {fileID: 32900000, guid: aa423a4e442892240bb4f5d3d91964ad, type: 3}
+  dialogText: "\u5728\u89C2\u5BDF\u4E86\u5404\u79CD\u69AB\u536F\u7ED3\u6784\u4E4B\u540E\uFF0C\u4F60\u6709\u4E86\u65B0\u7684\u9886\u609F"
 --- !u!114 &2046624051
 MonoBehaviour:
   m_ObjectHideFlags: 0
