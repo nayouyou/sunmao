@@ -11,6 +11,8 @@ public class InteractExclamationTip : MonoBehaviour
     public string itemUniqueId;
     [Header("感叹号预制体（资源内预制体，无需提前放入场景）")]
     public GameObject exclamationPrefab;
+    [Header("感叹号水平偏移（正数向右，用于对齐偏左/偏右的物体）")]
+    public float tipOffsetX = 0f;
     [Header("感叹号相对于物体向上偏移距离")]
     public float tipOffsetY = 0.6f;
     [Header("【单个物体独立调节】感叹号缩放大小")]
@@ -49,9 +51,16 @@ public class InteractExclamationTip : MonoBehaviour
                 _runtimeTip.SetActive(near);
         }
 
-        // 浮动动画
+        // 浮动动画（顺带每帧纠正一次缩放与偏移：物体缩放可能在运行时被脚本改动，
+        // 比如 Start 里设成 0.7、组装后变成 0.8，感叹号要始终跟着保持同样大小）
         if (_runtimeTip != null && _runtimeTip.activeSelf)
         {
+            Vector3 ps = transform.lossyScale;
+            float sx = Mathf.Approximately(ps.x, 0f) ? 1f : ps.x;
+            float sy = Mathf.Approximately(ps.y, 0f) ? 1f : ps.y;
+            float sz = Mathf.Approximately(ps.z, 0f) ? 1f : ps.z;
+            _runtimeTip.transform.localScale = new Vector3(tipScale / sx, tipScale / sy, tipScale / sz);
+
             float verticalShift = Mathf.Sin(Time.time * floatSpeed) * floatRange;
             _runtimeTip.transform.localPosition = _baseLocalPos + Vector3.up * verticalShift;
         }
@@ -71,11 +80,19 @@ public class InteractExclamationTip : MonoBehaviour
                 _runtimeTip = Instantiate(exclamationPrefab);
                 // false：不继承父物体缩放旋转
                 _runtimeTip.transform.SetParent(transform, false);
-                // Z轴向前偏移，防止被物体遮挡
-                _baseLocalPos = new Vector3(0, tipOffsetY, -0.2f);
+
+                // 抵消父物体的缩放：物体本身缩放五花八门（有的 0.7、有的 4），
+                // 不抵消的话感叹号就会有的巨大、有的很小
+                Vector3 ps = transform.lossyScale;
+                float sx = Mathf.Approximately(ps.x, 0f) ? 1f : ps.x;
+                float sy = Mathf.Approximately(ps.y, 0f) ? 1f : ps.y;
+                float sz = Mathf.Approximately(ps.z, 0f) ? 1f : ps.z;
+
+                // Z轴向前偏移，防止被物体遮挡（偏移量不抵消：每个物体的 tipOffsetY 已按自身缩放手工调好）
+                _baseLocalPos = new Vector3(tipOffsetX, tipOffsetY, -0.2f);
                 _runtimeTip.transform.localPosition = _baseLocalPos;
-                // 应用当前物体独立缩放设置
-                _runtimeTip.transform.localScale = Vector3.one * tipScale;
+                // 应用当前物体独立缩放设置（除以父缩放 → 世界尺寸一致）
+                _runtimeTip.transform.localScale = new Vector3(tipScale / sx, tipScale / sy, tipScale / sz);
                 // 强制提高渲染层级，避免被瓦片/家具遮挡
                 SpriteRenderer tipRenderer = _runtimeTip.GetComponent<SpriteRenderer>();
                 if (tipRenderer != null)

@@ -2097,8 +2097,12 @@ MonoBehaviour:
   originalScale: {x: 4, y: 4.5, z: 1}
   assembledPos: {x: 2.6, y: -3.8, z: 0}
   assembledScale: {x: 3.2, y: 3.8, z: 0.8}
-  firstClickTip: "\u662F\u5426\u7EC4\u88C5\u5C0F\u677F\u51F3\uFF08Q\u786E\u8BA4/E\u53D6\u6D88\uFF09"
-  secondClickTip: "\u662F\u5426\u8981\u56DE\u5FC6\u5C0F\u677F\u51F3\u7684\u7EC4\u88C5\u8FC7\u7A0B\uFF08Q\u786E\u8BA4/E\u53D6\u6D88\uFF09"
+  firstClickTip: "\u662F\u5426\u7EC4\u88C5\u5C0F\u677F\u51F3"
+  introTips:
+  - "\u8FD9\u4F3C\u4E4E\u662F\u4E00\u4E9B\u6CA1\u7528\u5B8C\u7684\u6728\u6599"
+  - "\u770B\u4E0A\u53BB\u80FD\u62FC\u51FA\u4E2A\u5750\u5177"
+  - "\u6B63\u597D\u7528\u6765\u7EC3\u7EC3\u624B"
+  secondClickTip: "\u662F\u5426\u8981\u56DE\u5FC6\u5C0F\u677F\u51F3\u7684\u7EC4\u88C5\u8FC7\u7A0B"
   obtainedDialogText: "\u539F\u6765\u662F\u8FD9\u6837\uFF01\u6211\u83B7\u5F97\u4E86{0}"
 --- !u!114 &469598785
 MonoBehaviour:
@@ -2115,7 +2119,7 @@ MonoBehaviour:
   itemUniqueId: chair_1
   exclamationPrefab: {fileID: 1329133524599578218, guid: 61a3fcbaeb1d4d448b1463751496fe09, type: 3}
   tipOffsetY: 0.15
-  tipScale: 0.4
+  tipScale: 1
   floatSpeed: 2
   floatRange: 0.03
   showDistance: 3
@@ -3545,6 +3549,9 @@ MonoBehaviour:
   assembledPos: {x: 0, y: 0, z: 0}
   assembledScale: {x: 0.8, y: 0.8, z: 1}
   firstClickTip: "\u5404\u5F0F\u5404\u6837\u7684\u6728\u5DE5\u5DE5\u5177"
+  introTips:
+  - "\u952F\u3001\u5228\u3001\u51FF\u3001\u89C4\uFF0C\u4E00\u6837\u4E0D\u7F3A"
+  - "\u6728\u67C4\u90FD\u88AB\u6478\u5F97\u53D1\u4EAE"
   secondClickTip: "\u5404\u5F0F\u5404\u6837\u7684\u6728\u5DE5\u5DE5\u5177"
   obtainedDialogText: "\u539F\u6765\u662F\u8FD9\u6837\uFF01\u6211\u83B7\u5F97\u4E86{0}"
 --- !u!61 &1066572855
@@ -4167,8 +4174,10 @@ MonoBehaviour:
   playerSpawnPos: {x: -6.5, y: -4.29}
   triggerMode: 1
   requireConfirm: 1
-  confirmText: "\u8981\u722C\u4E0A\u9601\u697C\u5417\uFF1F\uFF08Q \u786E\u8BA4 /
-    E \u53D6\u6D88\uFF09"
+  introTips:
+  - "\u8FD9\u5E45\u753B\u4F3C\u4E4E\u53EF\u4EE5\u62C6\u4E0B\u6765"
+  - "\u753B\u540E\u5934\u6709\u9053\u7A84\u697C\u68AF\uFF0C\u5F80\u4E0A\u50CF\u662F\u901A\u5230\u9601\u697C"
+  confirmText: "\u8981\u722C\u4E0A\u9601\u697C\u5417\uFF1F"
   requiredItems:
   - {fileID: 11400000, guid: 04e120a2149a3264fad9593950087cc3, type: 2}
   - {fileID: 11400000, guid: 536a8dcaea3c5ed4e9b39e795d307717, type: 2}
@@ -4248,6 +4257,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemUniqueId: trigger_attic
   exclamationPrefab: {fileID: 1329133524599578218, guid: 61a3fcbaeb1d4d448b1463751496fe09, type: 3}
+  tipOffsetX: 0.55
   tipOffsetY: 1.2
   tipScale: 1
   floatSpeed: 2
@@ -5915,6 +5925,9 @@ MonoBehaviour:
   assembledPos: {x: 0, y: 0, z: 0}
   assembledScale: {x: 0.8, y: 0.8, z: 1}
   firstClickTip: "\u662F\u5E08\u7236\u5931\u8E2A\u4E4B\u524D\u7684\u83B7\u5956\u4F5C\u54C1"
+  introTips:
+  - "\u4ECE\u524D\u5E08\u7236\u9694\u4E09\u5DEE\u4E94\u5C31\u62FF\u5E03\u64E6\u5B83\u4E00\u904D"
+  - "\u5982\u4ECA\u4E0A\u9762\u79EF\u7740\u539A\u539A\u4E00\u5C42\u7070\uFF0C\u4E00\u78B0\u5C31\u7559\u4E0B\u5370\u5B50"
   secondClickTip: "\u662F\u5E08\u7236\u5931\u8E2A\u4E4B\u524D\u7684\u83B7\u5956\u4F5C\u54C1"
   obtainedDialogText: "\u539F\u6765\u662F\u8FD9\u6837\uFF01\u6211\u83B7\u5F97\u4E86{0}"
 --- !u!61 &1634432936
@@ -6306,6 +6319,9 @@ MonoBehaviour:
   assembledPos: {x: 0, y: 0, z: 0}
   assembledScale: {x: 0.8, y: 0.8, z: 1}
   firstClickTip: "\u662F\u5E08\u7236\u5931\u8E2A\u4E4B\u524D\u7684\u83B7\u5956\u4F5C\u54C1"
+  introTips:
+  - "\u4ECE\u524D\u5E08\u7236\u9694\u4E09\u5DEE\u4E94\u5C31\u62FF\u5E03\u64E6\u5B83\u4E00\u904D"
+  - "\u5982\u4ECA\u4E0A\u9762\u79EF\u7740\u539A\u539A\u4E00\u5C42\u7070\uFF0C\u4E00\u78B0\u5C31\u7559\u4E0B\u5370\u5B50"
   secondClickTip: "\u662F\u5E08\u7236\u5931\u8E2A\u4E4B\u524D\u7684\u83B7\u5956\u4F5C\u54C1"
   obtainedDialogText: "\u539F\u6765\u662F\u8FD9\u6837\uFF01\u6211\u83B7\u5F97\u4E86{0}"
 --- !u!61 &1845833131

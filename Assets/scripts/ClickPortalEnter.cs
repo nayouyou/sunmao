@@ -30,6 +30,10 @@ public class ClickPortalEnter : MonoBehaviour
     [Header("前置条件（需已组装完成的物品，留空=无条件）")]
     [Tooltip("缺任意一项时不传送，改为提示缺少的物品")]
     public ItemData[] requiredItems;
+    [Header("逐句出现的观察文案（点一次出一句，全部看完才弹出确认窗；留空=直接弹确认）")]
+    [TextArea]
+    public string[] introTips;
+
     [Header("条件不满足时的提示文案（留空=默认列出缺少的物品）")]
     [TextArea]
     public string missingText;
@@ -37,6 +41,10 @@ public class ClickPortalEnter : MonoBehaviour
     private Collider2D portalCol;
     private bool isLoadingScene = false;
     private DialogMode _dialogMode = DialogMode.None;
+    private bool _isIntroShowing = false;   // 正在逐句显示观察文案
+    private bool _introDone = false;        // 本次游玩已看完铺垫，不再重复
+    private int _introIndex = -1;
+    private int _introStartFrame = -1;      // 开始那一帧的点击不再用来翻句
 
     void Start()
     {
@@ -54,6 +62,19 @@ public class ClickPortalEnter : MonoBehaviour
 
     void Update()
     {
+        // 逐句铺垫：点击或 Q/E 都翻到下一句（开始那一帧的同一次点击不算）
+        if (_isIntroShowing)
+        {
+            bool clicked = Input.GetMouseButtonDown(0) && Time.frameCount != _introStartFrame;
+            if (clicked
+                || Input.GetKeyDown(GameKeys.DialogConfirm)
+                || Input.GetKeyDown(GameKeys.DialogCancel))
+            {
+                AdvanceIntro();
+            }
+            return;
+        }
+
         if (_dialogMode == DialogMode.None) return;
 
         if (Input.GetKeyDown(GameKeys.DialogConfirm))
@@ -83,6 +104,7 @@ public class ClickPortalEnter : MonoBehaviour
     void OnMouseDown()
     {
         if (triggerMode != TriggerMode.Click) return;
+        if (_isIntroShowing) return;      // 铺垫期间点击只用来翻句
         if (isLoadingScene || _dialogMode != DialogMode.None) return;
 
         GameObject player = CurrentPlayer();
@@ -111,6 +133,14 @@ public class ClickPortalEnter : MonoBehaviour
 
         if (requireConfirm)
         {
+            // 有铺垫文案且本次还没看过 → 先逐句说，最后才弹确认窗
+            if (!_introDone && introTips != null && introTips.Length > 0)
+            {
+                _introDone = true;
+                _introIndex = 0;
+                ShowIntroLine();
+                return;
+            }
             ShowDialog(DialogMode.Confirm, confirmText);
             return;
         }
@@ -154,6 +184,45 @@ public class ClickPortalEnter : MonoBehaviour
         };
     }
 
+    /// <summary>显示当前这一句铺垫</summary>
+    void ShowIntroLine()
+    {
+        GlobalUIRef ui = GlobalUIRef.Instance;
+        if (ui == null || ui.dialogBox == null || ui.dialogTipText == null)
+        {
+            // UI 缺失时直接跳到确认，避免流程中断
+            _isIntroShowing = false;
+            ShowDialog(DialogMode.Confirm, confirmText);
+            return;
+        }
+
+        _isIntroShowing = true;
+        _introStartFrame = Time.frameCount;
+        _introIndex = Mathf.Clamp(_introIndex, 0, introTips.Length - 1);
+        ui.dialogBox.SetActive(true);
+        Canvas.ForceUpdateCanvases();
+        ui.dialogTipText.text = introTips[_introIndex];
+    }
+
+    /// <summary>翻到下一句；说完最后一句就弹出原来的确认窗</summary>
+    void AdvanceIntro()
+    {
+        _introIndex++;
+        if (introTips != null && _introIndex < introTips.Length)
+        {
+            ShowIntroLine();
+            return;
+        }
+        _isIntroShowing = false;
+        ShowDialog(DialogMode.Confirm, confirmText);
+    }
+
+    /// <summary>文案接口：外部设置逐句铺垫（传 null 表示不改）</summary>
+    public void SetIntroTips(string[] tips)
+    {
+        if (tips != null) introTips = tips;
+    }
+
     void ShowDialog(DialogMode mode, string text)
     {
         GlobalUIRef ui = GlobalUIRef.Instance;
@@ -172,6 +241,7 @@ public class ClickPortalEnter : MonoBehaviour
     void HideDialog()
     {
         _dialogMode = DialogMode.None;
+        _isIntroShowing = false;
         GlobalUIRef ui = GlobalUIRef.Instance;
         if (ui != null && ui.dialogBox != null)
         {

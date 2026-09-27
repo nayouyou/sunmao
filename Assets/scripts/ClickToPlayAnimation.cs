@@ -8,6 +8,10 @@ using System.Collections.Generic;
 /// 可交互组装零件点击脚本
 /// 挂载：每个场景可点击零件物体
 /// 功能：点击弹窗、播放组装视频、组装完成存档并添加物品进背包
+/// 文案接口：
+///   运行时改某一个物体：GetComponent<ClickToPlayAnimation>().SetMyTexts(句子数组, 首句, 二次句)
+///   运行时按 partKey 批量改：ClickToPlayAnimation.SetTexts("attic_chair", 句子数组, 首句, 二次句)
+///   场景加载前先登记也行，物体 Start 时会自动套用；传 null 的项表示不改动
 /// 依赖：GlobalUIRef、GameGlobalData、BagShowVideoManager、HintManager
 /// </summary>
 public class ClickToPlayAnimation : MonoBehaviour
@@ -42,8 +46,11 @@ public class ClickToPlayAnimation : MonoBehaviour
     public Vector3 assembledScale = new Vector3(0.8f, 0.8f, 1);
 
     [Header("弹窗提示文字")]
-    public string firstClickTip = "要把这堆木料加工完成吗？(Q确认/E取消)";
-    public string secondClickTip = "再次观看组装动画？(Q确认/E取消)";
+    public string firstClickTip = "要把这堆木料加工完成吗？";
+    public string secondClickTip = "再次观看组装动画？";
+
+    [Header("逐句出现的观察文案（点一次出一句，全部看完才弹出确认窗；留空=直接弹确认）")]
+    public string[] introTips;
 
     [Header("组装完成后的对话文案（{0} 会替换为物品名称）")]
     public string obtainedDialogText = "原来是这样！我获得了{0}";
@@ -66,14 +73,75 @@ public class ClickToPlayAnimation : MonoBehaviour
     /// 关闭时只允许归属者处理，避免其他实例抢先关闭并误完成
     /// </summary>
     private static ClickToPlayAnimation _stillImageOwner;
+
+    // 静态组装图用的独立全屏画面层（不复用视频面板，互不影响）
+    private static GameObject _stillFullRoot;
+
+    /// <summary>静态组装图是否正在全屏显示（Esc 菜单等其它系统据此避让）</summary>
+    public static bool IsStillImageShowing
+    {
+        get { return _stillFullRoot != null && _stillFullRoot.activeSelf; }
+    }
+    private static RawImage _stillFullImage;
+
+    /// <summary>
+    /// 把静态组装图铺满整屏：在画布下建一个全屏 RawImage（只建一次，之后复用），
+    /// 视频面板完全不参与，所以不会影响视频播放的比例适配
+    /// </summary>
+    void ShowStillFullScreen()
+    {
+        Canvas canvas = videoPanel != null ? videoPanel.GetComponentInParent<Canvas>() : null;
+        if (canvas == null && videoRawImage != null) canvas = videoRawImage.GetComponentInParent<Canvas>();
+
+        if (canvas == null)
+        {
+            // 兜底：找不到画布时退回原来的面板显示
+            if (videoPanel != null) videoPanel.SetActive(true);
+            if (videoRawImage != null)
+            {
+                videoRawImage.gameObject.SetActive(true);
+                videoRawImage.texture = assemblyStillImage;
+            }
+            return;
+        }
+
+        if (_stillFullRoot == null || _stillFullRoot.transform.parent != canvas.transform)
+        {
+            if (_stillFullRoot != null) Destroy(_stillFullRoot);
+            _stillFullRoot = new GameObject("AssembledStillFullScreen", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
+            RectTransform rt = _stillFullRoot.GetComponent<RectTransform>();
+            rt.SetParent(canvas.transform, false);
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.sizeDelta = Vector2.zero;
+            rt.anchoredPosition = Vector2.zero;
+            _stillFullImage = _stillFullRoot.GetComponent<RawImage>();
+            _stillFullImage.raycastTarget = false;
+        }
+
+        _stillFullRoot.SetActive(true);
+        _stillFullRoot.transform.SetAsLastSibling();   // 盖在最上层
+        _stillFullImage.texture = assemblyStillImage;
+    }
+
+    void HideStillFullScreen()
+    {
+        if (_stillFullRoot != null) _stillFullRoot.SetActive(false);
+    }
+
     private ItemData _pendingUnlockNotify;
     private bool _isDialogShowing = false;
+    private bool _isIntroShowing = false;   // 正在逐句显示观察文案
+    private bool _introDone = false;        // 本次游玩已看完铺垫，不再重复
+    private int _introIndex = -1;
     private int _currentPlayCount = 0;
     private RenderTexture _renderTexture;
     private VideoPlayer _assembleVideoPlayer;
 
     void Start()
     {
+        ApplyTextOverride();      // 先套用外部通过接口设置的文案（没有则用 Inspector 里的）
+
         // 获取精灵渲染组件，无则自动创建
         _spriteRenderer = GetComponent<SpriteRenderer>();
         if (_spriteRenderer == null)
@@ -141,13 +209,25 @@ public class ClickToPlayAnimation : MonoBehaviour
     void Update()
     {
         // 鼠标点击检测，弹窗/视频打开时屏蔽点击
-        if (Input.GetMouseButtonDown(0) && !_isDialogShowing && !videoPanel.activeSelf)
+        bool clickUsed = false;
+        if (Input.GetMouseButtonDown(0) && !_isDialogShowing && !videoPanel.activeSelf && !_isShowingStill)
         {
             RayCastClick();
+            clickUsed = true;      // 这一下点击已经用来开窗，同一帧不能再翻句
         }
 
-        // 弹窗快捷键：Q确认播放 / E取消
-        if (_isDialogShowing)
+        // 逐句铺垫：点击或 Q/E 都翻到下一句
+        if (_isIntroShowing)
+        {
+            if ((!clickUsed && Input.GetMouseButtonDown(0))
+                || Input.GetKeyDown(GameKeys.DialogConfirm)
+                || Input.GetKeyDown(GameKeys.DialogCancel))
+            {
+                AdvanceIntro();
+            }
+        }
+        // 弹窗快捷键：Q确认播放 / E取消（只在确认窗里生效）
+        else if (_isDialogShowing)
         {
             if (Input.GetKeyDown(GameKeys.DialogConfirm))
             {
@@ -161,7 +241,7 @@ public class ClickToPlayAnimation : MonoBehaviour
         }
 
         // 视频面板关闭快捷键
-        if (videoPanel.activeSelf && Input.GetKeyDown(GameKeys.ClosePanel))
+        if ((videoPanel.activeSelf || _isShowingStill) && Input.GetKeyDown(GameKeys.ClosePanel))
         {
             // 无组装视频的物件为静态图模式
             bool isStillMode = (videoClip == null && assemblyStillImage != null);
@@ -201,13 +281,162 @@ public class ClickToPlayAnimation : MonoBehaviour
                 ShowMissingTip(missing);
                 return;
             }
-            OpenDialog();
+            StartIntroOrDialog();
         }
     }
 
     /// <summary>
-    /// 打开确认弹窗
+    /// 这个物体是不是"只是看看"：没有组装动画、没有静态图、也没有物品奖励
+    /// 这类物体的文案顺序是"原句先说，再逐句补细节"，说完自动关闭，不弹确认窗
     /// </summary>
+    bool IsLookOnly()
+    {
+        return videoClip == null
+            && assemblyStillImage == null
+            && itemData == null
+            && (additionalItems == null || additionalItems.Length == 0);
+    }
+
+    /// <summary>
+    /// 点击零件：有铺垫文案就逐句显示，看完（或已组装过）再弹确认窗
+    /// </summary>，看完（或已组装过）再弹确认窗
+    /// </summary>
+    /// <summary>本次要逐句显示的完整序列（观看类 = 原句 + 铺垫；组装类 = 铺垫）</summary>
+    string[] BuildSequence()
+    {
+        if (introTips == null || introTips.Length == 0) return null;
+        if (!IsLookOnly()) return introTips;
+
+        string first = _isAssembled ? secondClickTip : firstClickTip;
+        if (string.IsNullOrEmpty(first)) return introTips;
+
+        string[] seq = new string[introTips.Length + 1];
+        seq[0] = first;
+        for (int i = 0; i < introTips.Length; i++) seq[i + 1] = introTips[i];
+        return seq;
+    }
+
+    void StartIntroOrDialog()
+    {
+        if (!_isAssembled && !_introDone && introTips != null && introTips.Length > 0)
+        {
+            _introDone = true;
+            _introIndex = 0;
+            ShowIntroLine();
+            return;
+        }
+        OpenDialog();
+    }
+
+    /// <summary>显示当前这一句铺垫</summary>
+    void ShowIntroLine()
+    {
+        if (dialogBox == null || dialogTipText == null)
+        {
+            OpenDialog();
+            return;
+        }
+        _requirementsMet = true;
+        _isDialogShowing = true;
+        _isIntroShowing = true;
+        dialogBox.SetActive(true);
+        Canvas.ForceUpdateCanvases();
+        string[] seq = BuildSequence();
+        if (seq == null || seq.Length == 0) { OpenDialog(); return; }
+        _introIndex = Mathf.Clamp(_introIndex, 0, seq.Length - 1);
+        dialogTipText.text = seq[_introIndex];
+    }
+
+    /// <summary>翻到下一句；说完最后一句就接原来的确认窗</summary>
+    void AdvanceIntro()
+    {
+        _introIndex++;
+        string[] seq = BuildSequence();
+        if (seq != null && _introIndex < seq.Length)
+        {
+            ShowIntroLine();
+            return;
+        }
+
+        _isIntroShowing = false;
+        // 只是看看的物体：说完就关，不弹确认窗；
+        // 同时把感叹号永久去掉——观察类物品只提示一次
+        if (IsLookOnly())
+        {
+            InteractExclamationTip tip = GetComponent<InteractExclamationTip>();
+            if (tip != null) tip.CompleteInteract();
+            CloseDialog();
+            return;
+        }
+        OpenDialog();
+    }
+
+    // ================= 文案接口 =================
+    // 覆盖表：按键（partKey）登记文案，场景加载前登记也能在物体 Start 时生效
+    private static readonly Dictionary<string, string[]> _overrideIntro = new Dictionary<string, string[]>();
+    private static readonly Dictionary<string, string> _overrideFirst = new Dictionary<string, string>();
+    private static readonly Dictionary<string, string> _overrideSecond = new Dictionary<string, string>();
+
+    /// <summary>这个物体的文案键：优先用 partKey，为空时用物体名</summary>
+    public string TextKey { get { return string.IsNullOrEmpty(partKey) ? gameObject.name : partKey; } }
+
+    /// <summary>
+    /// 文案接口：按键设置某个交互物的文案。任何脚本、任何时刻都能调用；
+    /// 物体还没加载时会先记下来，等它 Start 时自动套用。
+    /// introLines / firstTip / secondTip 传 null 表示该项不改。
+    /// </summary>
+    public static void SetTexts(string key, string[] introLines, string firstTip = null, string secondTip = null)
+    {
+        if (string.IsNullOrEmpty(key)) return;
+        if (introLines != null) _overrideIntro[key] = introLines;
+        if (firstTip != null) _overrideFirst[key] = firstTip;
+        if (secondTip != null) _overrideSecond[key] = secondTip;
+
+        // 场景里已经存在的同类物体，立即同步
+        ClickToPlayAnimation[] all = FindObjectsOfType<ClickToPlayAnimation>();
+        foreach (ClickToPlayAnimation c in all)
+        {
+            if (c != null && c.TextKey == key) c.ApplyTextOverride();
+        }
+    }
+
+    /// <summary>清除某个键的文案覆盖，恢复用 Inspector 里的内容</summary>
+    public static void ClearTexts(string key)
+    {
+        if (string.IsNullOrEmpty(key)) return;
+        _overrideIntro.Remove(key);
+        _overrideFirst.Remove(key);
+        _overrideSecond.Remove(key);
+    }
+
+    /// <summary>取某个键当前的铺垫文案（没有覆盖时返回 null）</summary>
+    public static string[] GetIntroTips(string key)
+    {
+        string[] tips;
+        if (!string.IsNullOrEmpty(key) && _overrideIntro.TryGetValue(key, out tips)) return tips;
+        return null;
+    }
+
+    /// <summary>实例接口：直接改这一个交互物的文案（同时登记到覆盖表，重进场景仍生效）</summary>
+    public void SetMyTexts(string[] introLines, string firstTip = null, string secondTip = null)
+    {
+        if (introLines != null) introTips = introLines;
+        if (firstTip != null) firstClickTip = firstTip;
+        if (secondTip != null) secondClickTip = secondTip;
+        SetTexts(TextKey, introLines, firstTip, secondTip);
+    }
+
+    /// <summary>把覆盖表里的文案套到这个实例上（Start 时自动调用）</summary>
+    public void ApplyTextOverride()
+    {
+        string k = TextKey;
+        string[] tips;
+        if (_overrideIntro.TryGetValue(k, out tips) && tips != null) introTips = tips;
+        string t;
+        if (_overrideFirst.TryGetValue(k, out t) && t != null) firstClickTip = t;
+        if (_overrideSecond.TryGetValue(k, out t) && t != null) secondClickTip = t;
+    }
+
     /// <summary>
     /// 前置条件不满足时，用全局弹窗显示缺少的物品（Q/E 均可关闭，不会播放动画）
     /// </summary>
@@ -251,6 +480,7 @@ public class ClickToPlayAnimation : MonoBehaviour
     {
         if (dialogBox == null) return;
         _isDialogShowing = false;
+        _isIntroShowing = false;
         dialogBox.SetActive(false);
 
         // "已知晓"提示关闭后，才通知解锁流程
@@ -390,10 +620,8 @@ public class ClickToPlayAnimation : MonoBehaviour
 
         _stillImageOwner = this;
         _isShowingStill = true;
-        videoPanel.SetActive(true);
         Canvas.ForceUpdateCanvases();
-        videoRawImage.gameObject.SetActive(true);
-        videoRawImage.texture = assemblyStillImage;
+        ShowStillFullScreen();      // 用独立的全屏层显示，不碰视频面板
     }
 
     /// <summary>
@@ -402,6 +630,7 @@ public class ClickToPlayAnimation : MonoBehaviour
     void HideStillImage()
     {
         _isShowingStill = false;
+        HideStillFullScreen();      // 只关掉独立全屏层
         if (_stillImageOwner == this)
             _stillImageOwner = null;
         if (videoRawImage != null)

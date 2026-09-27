@@ -185,6 +185,9 @@ MonoBehaviour:
   assembledPos: {x: 0, y: 0, z: 0}
   assembledScale: {x: 0.8, y: 0.8, z: 1}
   firstClickTip: "\u4E00\u4E9B\u6728\u6599"
+  introTips:
+  - "\u5899\u89D2\u90A3\u51E0\u645E\u5806\u5F97\u6574\u6574\u9F50\u9F50"
+  - "\u622A\u9762\u8FD8\u7559\u7740\u952F\u75D5\uFF0C\u770B\u7740\u662F\u80FD\u7528\u7684"
   secondClickTip: "\u4E00\u4E9B\u6728\u6599"
   obtainedDialogText: "\u539F\u6765\u662F\u8FD9\u6837\uFF01\u6211\u83B7\u5F97\u4E86{0}"
 --- !u!61 &81310960
@@ -403,8 +406,12 @@ MonoBehaviour:
   originalScale: {x: 0.7, y: 0.7, z: 1}
   assembledPos: {x: -0.164, y: 1.239, z: 0}
   assembledScale: {x: 0.7, y: 0.7, z: 1}
-  firstClickTip: "\u662F\u5426\u4FEE\u590D\u7B14\u7B52\uFF08Q\u786E\u8BA4/E\u53D6\u6D88\uFF09"
-  secondClickTip: "\u662F\u5426\u89C2\u5BDF\u7B14\u7B52\uFF08Q\u786E\u8BA4/E\u53D6\u6D88\uFF09"
+  firstClickTip: "\u662F\u5426\u4FEE\u590D\u7B14\u7B52"
+  introTips:
+  - "\u6848\u5934\u90A3\u4E2A\u7B14\u7B52\uFF0C\u7B8D\u5DF2\u7ECF\u6563\u4E86"
+  - "\u51E0\u7247\u6728\u677F\u8FD8\u80FD\u5BF9\u5F97\u4E0A\uFF0C\u662F\u505A\u7B52\u8EAB\u7684\u6599"
+  - "\u5E08\u7236\u7684\u7B14\u4ECE\u524D\u63D2\u5728\u8FD9\u91CC\uFF0C\u4ED6\u5199\u5B57\u4E5F\u50CF\u505A\u6D3B\uFF0C\u4E00\u7B14\u4E0D\u82DF"
+  secondClickTip: "\u662F\u5426\u89C2\u5BDF\u7B14\u7B52"
   obtainedDialogText: "\u539F\u6765\u662F\u8FD9\u6837\uFF01\u6211\u83B7\u5F97\u4E86{0}"
 --- !u!114 &93149520
 MonoBehaviour:
@@ -421,7 +428,7 @@ MonoBehaviour:
   itemUniqueId: pencup
   exclamationPrefab: {fileID: 1329133524599578218, guid: 61a3fcbaeb1d4d448b1463751496fe09, type: 3}
   tipOffsetY: 0.5
-  tipScale: 2
+  tipScale: 1.2
   floatSpeed: 2
   floatRange: 0.05
   showDistance: 3
@@ -533,6 +540,9 @@ MonoBehaviour:
   assembledPos: {x: 0, y: 0, z: 0}
   assembledScale: {x: 0.8, y: 0.8, z: 1}
   firstClickTip: "\u7834\u65E7\u7684\u6728\u95E8\uFF0C\u5F97\u627E\u4E2A\u65F6\u95F4\u5C06\u4ED6\u4E22\u6389"
+  introTips:
+  - "\u95E8\u8F74\u6B6A\u4E86\uFF0C\u95E8\u5173\u4E0D\u4E25"
+  - "\u95E8\u677F\u4E0A\u8FD8\u7559\u7740\u51E0\u9053\u65E7\u5228\u75D5"
   secondClickTip: "\u7834\u65E7\u7684\u6728\u95E8\uFF0C\u5F97\u627E\u4E2A\u65F6\u95F4\u5C06\u4ED6\u4E22\u6389"
   obtainedDialogText: "\u539F\u6765\u662F\u8FD9\u6837\uFF01\u6211\u83B7\u5F97\u4E86{0}"
 --- !u!61 &885462703
@@ -658,6 +668,8 @@ MonoBehaviour:
   assembledPos: {x: 0, y: 0, z: 0}
   assembledScale: {x: 0.8, y: 0.8, z: 1}
   firstClickTip: "\u67DC\u5B50\u91CC\u5B58\u653E\u7740\u8BB8\u591A\u5907\u7528\u7684\u6728\u5DE5\u5DE5\u5177"
+  introTips:
+  - "\u5E38\u7528\u7684\u6302\u5899\u4E0A\uFF0C\u4E0D\u5E38\u7528\u7684\u6536\u5728\u8FD9\u91CC"
   secondClickTip: "\u67DC\u5B50\u91CC\u5B58\u653E\u7740\u8BB8\u591A\u5907\u7528\u7684\u6728\u5DE5\u5DE5\u5177"
   obtainedDialogText: "\u539F\u6765\u662F\u8FD9\u6837\uFF01\u6211\u83B7\u5F97\u4E86{0}"
 --- !u!61 &1059357583
@@ -783,6 +795,8 @@ MonoBehaviour:
   assembledPos: {x: 0, y: 0, z: 0}
   assembledScale: {x: 0.8, y: 0.8, z: 1}
   firstClickTip: "\u5927\u91CF\u7684\u6728\u5DE5\u56FE\u7EB8\uFF0C\u8BA9\u4EBA\u773C\u82B1\u7F2D\u4E71"
+  introTips:
+  - "\u6BCF\u4E00\u5F20\u8FB9\u89D2\u90FD\u7559\u7740\u5E08\u7236\u7684\u6279\u6CE8\uFF0C\u5B57\u6781\u5C0F\uFF0C\u5374\u4E00\u7B14\u4E0D\u4E71"
   secondClickTip: "\u5927\u91CF\u7684\u6728\u5DE5\u56FE\u7EB8\uFF0C\u8BA9\u4EBA\u773C\u82B1\u7F2D\u4E71"
   obtainedDialogText: "\u539F\u6765\u662F\u8FD9\u6837\uFF01\u6211\u83B7\u5F97\u4E86{0}"
 --- !u!61 &1089994093
@@ -1058,6 +1072,9 @@ MonoBehaviour:
   assembledPos: {x: 0, y: 0, z: 0}
   assembledScale: {x: 0.8, y: 0.8, z: 1}
   firstClickTip: "\u5927\u91CF\u6728\u6599"
+  introTips:
+  - "\u67B6\u5B50\u4E0A\u4E00\u683C\u4E00\u683C\u7801\u5F97\u6574\u6574\u9F50\u9F50"
+  - "\u6309\u957F\u77ED\u7C97\u7EC6\u5206\u4E86\u5806\uFF0C\u53D6\u7528\u65B9\u4FBF"
   secondClickTip: "\u5927\u91CF\u6728\u6599"
   obtainedDialogText: "\u539F\u6765\u662F\u8FD9\u6837\uFF01\u6211\u83B7\u5F97\u4E86{0}"
 --- !u!61 &1529780976
@@ -1369,8 +1386,12 @@ MonoBehaviour:
   originalScale: {x: 0.7, y: 0.7, z: 1}
   assembledPos: {x: -0.87, y: -1.63, z: 0}
   assembledScale: {x: 0.7, y: 0.7, z: 1}
-  firstClickTip: "\u662F\u5426\u4FEE\u590D\u6258\u4E3E\u5C0F\u6728\u51F3\uFF08Q\u786E\u8BA4/E\u53D6\u6D88\uFF09"
-  secondClickTip: "\u662F\u5426\u89C2\u5BDF\u6258\u4E3E\u5C0F\u6728\u51F3\uFF08Q\u786E\u8BA4/E\u53D6\u6D88\uFF09"
+  firstClickTip: "\u662F\u5426\u4FEE\u590D\u6258\u4E3E\u5C0F\u6728\u51F3"
+  introTips:
+  - "\u8FD9\u53EA\u5C0F\u6728\u51F3\u662F\u57AB\u811A\u7528\u7684\uFF0C\u5982\u4ECA\u6B6A\u5728\u5899\u6839"
+  - "\u51F3\u9762\u4E0B\u591A\u52A0\u4E86\u4E00\u9053\u6258\u4E3E\u7684\u6A2A\u67A8\uFF0C\u662F\u5E08\u7236\u60EF\u7528\u7684\u624B\u6CD5"
+  - "\u4FEE\u597D\u5B83\uFF0C\u7AD9\u4E0A\u53BB\u5C31\u591F\u5F97\u7740\u9AD8\u5904\u7684\u67B6\u5B50\u4E86"
+  secondClickTip: "\u662F\u5426\u89C2\u5BDF\u6258\u4E3E\u5C0F\u6728\u51F3"
   obtainedDialogText: "\u539F\u6765\u662F\u8FD9\u6837\uFF01\u6211\u83B7\u5F97\u4E86{0}"
 --- !u!114 &1949177677
 MonoBehaviour:
@@ -1387,7 +1408,7 @@ MonoBehaviour:
   itemUniqueId: chair_2
   exclamationPrefab: {fileID: 1329133524599578218, guid: 61a3fcbaeb1d4d448b1463751496fe09, type: 3}
   tipOffsetY: 0.8
-  tipScale: 2
+  tipScale: 1.2
   floatSpeed: 2
   floatRange: 0.05
   showDistance: 3

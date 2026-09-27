@@ -43,7 +43,8 @@ public class SaveGameMenu : MonoBehaviour
         GlobalUIRef ui = GlobalUIRef.Instance;
         bool otherPanelOpen = ui != null
             && ((ui.videoPanel != null && ui.videoPanel.activeSelf)
-                || (ui.bagPanel != null && ui.bagPanel.activeSelf));
+                || (ui.bagPanel != null && ui.bagPanel.activeSelf)
+                || ClickToPlayAnimation.IsStillImageShowing);   // 组装静态图全屏时也归它处理
 
         if (!_menuOpen && !otherPanelOpen)
             OpenMenu();
