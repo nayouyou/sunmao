@@ -46,7 +46,7 @@ public class ClickToPlayAnimation : MonoBehaviour
     public string secondClickTip = "再次观看组装动画？(Q确认/E取消)";
 
     [Header("组装完成后的对话文案（{0} 会替换为物品名称）")]
-    public string obtainedDialogText = "原来是这样！我已知晓{0}";
+    public string obtainedDialogText = "原来是这样！我获得了{0}";
 
     // 全局UI缓存
     private GameObject dialogBox;
@@ -59,6 +59,7 @@ public class ClickToPlayAnimation : MonoBehaviour
     private bool _requirementsMet = true;
     private bool _isObtainedTipShowing = false;
     private bool _isShowingStill = false;
+    private bool _isPlayingVideo = false;
 
     /// <summary>
     /// 当前正在显示静态组装图的实例。场景里多个同类实例共享同一块组装面板，
@@ -173,7 +174,7 @@ public class ClickToPlayAnimation : MonoBehaviour
                     CompleteAssembly();
                 }
             }
-            else
+            else if (_isPlayingVideo)
             {
                 CloseVideo();
             }
@@ -185,8 +186,13 @@ public class ClickToPlayAnimation : MonoBehaviour
     /// </summary>
     void RayCastClick()
     {
-        Collider2D hit = Physics2D.OverlapPoint(InputHelper.MouseWorldPos);
-        if (hit != null && hit.gameObject == gameObject)
+        bool clickedSelf = false;
+        Collider2D[] hits = Physics2D.OverlapPointAll(InputHelper.MouseWorldPos);
+        foreach (Collider2D h in hits)
+        {
+            if (h != null && h.gameObject == gameObject) { clickedSelf = true; break; }
+        }
+        if (clickedSelf)
         {
             // 点击时先检查前置条件；缺少物品只提示，不进入确认流程
             List<ItemData> missing = BagChecker.GetMissingItems(requiredItems);
@@ -255,6 +261,10 @@ public class ClickToPlayAnimation : MonoBehaviour
             _pendingUnlockNotify = null;
             if (pending != null && ItemUnlockFlow.Instance != null)
                 ItemUnlockFlow.Instance.NotifyItemObtained(pending);
+            if (pending != null && EndingFlow.Instance != null)
+                EndingFlow.Instance.NotifyItemObtained(pending);
+            if (pending != null && PictureHintFlow.Instance != null)
+                PictureHintFlow.Instance.NotifyItemObtained(pending);
         }
     }
 
@@ -318,6 +328,7 @@ public class ClickToPlayAnimation : MonoBehaviour
         }
 
         _currentPlayCount = 0;
+        _isPlayingVideo = true;
         videoPanel.SetActive(true);
         videoRawImage.gameObject.SetActive(true);   // 画面区是全局共享对象，确保处于启用状态
         Canvas.ForceUpdateCanvases();
@@ -349,6 +360,7 @@ public class ClickToPlayAnimation : MonoBehaviour
     /// </summary>
     void CloseVideo()
     {
+        _isPlayingVideo = false;
         if (_assembleVideoPlayer != null)
         {
             _assembleVideoPlayer.Stop();

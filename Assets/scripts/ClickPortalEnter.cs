@@ -30,6 +30,9 @@ public class ClickPortalEnter : MonoBehaviour
     [Header("前置条件（需已组装完成的物品，留空=无条件）")]
     [Tooltip("缺任意一项时不传送，改为提示缺少的物品")]
     public ItemData[] requiredItems;
+    [Header("条件不满足时的提示文案（留空=默认列出缺少的物品）")]
+    [TextArea]
+    public string missingText;
 
     private Collider2D portalCol;
     private bool isLoadingScene = false;
@@ -98,7 +101,11 @@ public class ClickPortalEnter : MonoBehaviour
         List<ItemData> missing = BagChecker.GetMissingItems(requiredItems);
         if (missing.Count > 0)
         {
-            ShowDialog(DialogMode.Missing, "无法前往，还缺少：" + JoinItemTitles(missing) + "（E关闭）");
+            // 优先使用自定义提示文案；留空时默认列出缺少的物品
+            string msg = string.IsNullOrEmpty(missingText)
+                ? "无法前往，还缺少：" + JoinItemTitles(missing) + "（E关闭）"
+                : missingText;
+            ShowDialog(DialogMode.Missing, msg);
             return;
         }
 

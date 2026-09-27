@@ -114,9 +114,30 @@ public class OpeningScene : MonoBehaviour
     {
         if (_stage != Stage.Finish) return;
 
+        // 标记开场对话：进入主场景后由 IntroDialog 自动弹出
+        IntroDialog.Pending = true;
+        SceneManager.sceneLoaded -= OnGameSceneLoaded;
+        SceneManager.sceneLoaded += OnGameSceneLoaded;
+
         AsyncOperation op = SceneManager.LoadSceneAsync(gameSceneName, LoadSceneMode.Single);
         if (op == null)
             Debug.LogError($"OpeningScene：场景 {gameSceneName} 不在Build Settings中！");
+    }
+
+    /// <summary>主场景加载完成后，把开场对话脚本挂到跨场景的 GlobalCanvasRoot 上（无需在场景里手动配置）</summary>
+    void OnGameSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name != gameSceneName) return;
+        SceneManager.sceneLoaded -= OnGameSceneLoaded;
+
+        GlobalUIRef ui = GlobalUIRef.Instance;
+        if (ui == null)
+        {
+            Debug.LogError("OpeningScene：GlobalUIRef 缺失，无法启动开场对话");
+            return;
+        }
+        if (ui.GetComponent<IntroDialog>() == null)
+            ui.gameObject.AddComponent<IntroDialog>();
     }
 
     void PlayTrigger(Animator animator, string trigger)

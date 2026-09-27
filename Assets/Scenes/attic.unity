@@ -140,6 +140,7 @@ MonoBehaviour:
   tipScale: 1
   floatSpeed: 2
   floatRange: 0.25
+  showDistance: 3
 --- !u!114 &358631644
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -164,9 +165,9 @@ MonoBehaviour:
   originalScale: {x: 1, y: 1, z: 1}
   assembledPos: {x: -8.1355, y: -0.9895, z: 0}
   assembledScale: {x: 1, y: 1, z: 1}
-  firstClickTip: "\u662F\u5426\u89C2\u5BDF\u67DC\u5B50\uFF08Q\u786E\u8BA4/E\u53D6\u6D88\uFF09"
+  firstClickTip: "\u662F\u5426\u4FEE\u590D\u67DC\u5B50\uFF08Q\u786E\u8BA4/E\u53D6\u6D88\uFF09"
   secondClickTip: "\u662F\u5426\u89C2\u5BDF\u67DC\u5B50\uFF08Q\u786E\u8BA4/E\u53D6\u6D88\uFF09"
-  obtainedDialogText: "\u539F\u6765\u662F\u8FD9\u6837\uFF01\u6211\u5DF2\u77E5\u6653{0}"
+  obtainedDialogText: "\u539F\u6765\u662F\u8FD9\u6837\uFF01\u6211\u83B7\u5F97\u4E86{0}"
 --- !u!61 &745893863
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2061,6 +2062,7 @@ MonoBehaviour:
   tipScale: 1
   floatSpeed: 2
   floatRange: 0.25
+  showDistance: 3
 --- !u!114 &950000319
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2085,9 +2087,9 @@ MonoBehaviour:
   originalScale: {x: 1, y: 1, z: 1}
   assembledPos: {x: 6.784, y: -1.2545, z: 0}
   assembledScale: {x: 1, y: 1, z: 1}
-  firstClickTip: "\u662F\u5426\u89C2\u5BDF\u6905\u5B50\uFF08Q\u786E\u8BA4/E\u53D6\u6D88\uFF09"
+  firstClickTip: "\u662F\u5426\u4FEE\u590D\u6905\u5B50\uFF08Q\u786E\u8BA4/E\u53D6\u6D88\uFF09"
   secondClickTip: "\u662F\u5426\u89C2\u5BDF\u6905\u5B50\uFF08Q\u786E\u8BA4/E\u53D6\u6D88\uFF09"
-  obtainedDialogText: "\u539F\u6765\u662F\u8FD9\u6837\uFF01\u6211\u5DF2\u77E5\u6653{0}"
+  obtainedDialogText: "\u539F\u6765\u662F\u8FD9\u6837\uFF01\u6211\u83B7\u5F97\u4E86{0}"
 --- !u!61 &950000320
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2288,6 +2290,7 @@ MonoBehaviour:
   tipScale: 1
   floatSpeed: 2
   floatRange: 0.25
+  showDistance: 3
 --- !u!114 &1527296210
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2313,9 +2316,9 @@ MonoBehaviour:
   originalScale: {x: 1, y: 1, z: 1}
   assembledPos: {x: 5.013833, y: -0.77355075, z: 0}
   assembledScale: {x: 1, y: 1, z: 1}
-  firstClickTip: "\u662F\u5426\u89C2\u5BDF\u684C\u5B50\uFF08Q\u786E\u8BA4/E\u53D6\u6D88\uFF09"
+  firstClickTip: "\u662F\u5426\u4FEE\u590D\u684C\u5B50\uFF08Q\u786E\u8BA4/E\u53D6\u6D88\uFF09"
   secondClickTip: "\u662F\u5426\u89C2\u5BDF\u684C\u5B50\uFF08Q\u786E\u8BA4/E\u53D6\u6D88\uFF09"
-  obtainedDialogText: "\u539F\u6765\u662F\u8FD9\u6837\uFF01\u6211\u5DF2\u77E5\u6653{0}"
+  obtainedDialogText: "\u539F\u6765\u662F\u8FD9\u6837\uFF01\u6211\u83B7\u5F97\u4E86{0}"
 --- !u!114 &1877097183
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2334,6 +2337,7 @@ MonoBehaviour:
   tipScale: 1
   floatSpeed: 2
   floatRange: 0.25
+  showDistance: 3
 --- !u!114 &1877097184
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2358,9 +2362,9 @@ MonoBehaviour:
   originalScale: {x: 1, y: 1, z: 1}
   assembledPos: {x: -3.1092658, y: -0.8829276, z: 0}
   assembledScale: {x: 1, y: 1, z: 1}
-  firstClickTip: "\u662F\u5426\u89C2\u5BDF\u6761\u6848\uFF08Q\u786E\u8BA4/E\u53D6\u6D88\uFF09"
+  firstClickTip: "\u662F\u5426\u4FEE\u590D\u6761\u6848\uFF08Q\u786E\u8BA4/E\u53D6\u6D88\uFF09"
   secondClickTip: "\u662F\u5426\u89C2\u5BDF\u6761\u6848\uFF08Q\u786E\u8BA4/E\u53D6\u6D88\uFF09"
-  obtainedDialogText: "\u539F\u6765\u662F\u8FD9\u6837\uFF01\u6211\u5DF2\u77E5\u6653{0}"
+  obtainedDialogText: "\u539F\u6765\u662F\u8FD9\u6837\uFF01\u6211\u83B7\u5F97\u4E86{0}"
 --- !u!61 &1877097185
 BoxCollider2D:
   m_ObjectHideFlags: 0

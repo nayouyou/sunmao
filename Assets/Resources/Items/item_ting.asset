@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9446f177c76be25498ec9c9491bdd4e4, type: 3}
-  m_Name: item_debug_test
+  m_Name: item_ting
   m_EditorClassIdentifier: 
-  itemTitle: "\u6D4B\u8BD5"
-  itemDescription: "\u6D4B\u8BD5"
+  itemTitle: "\u69AB\u536F\u5320\u4EBA\u4E4B\u8BC1"
+  itemDescription: "\u5E08\u7236\u7559\u4E0B\u7684\u4FE1\u7269\uFF0C\u4E5F\u662F\u69AB\u536F\u5320\u4EBA\u51FA\u5E08\u7684\u51ED\u8BC1\u3002\u5B83\u89C1\u8BC1\u4E86\u4ECE\u5B66\u5F92\u5230\u5320\u4EBA\u7684\u4E00\u8DEF\uFF0C\u4E5F\u8BC1\u660E\u4F60\u5DF2\u7EE7\u627F\u5E08\u7236\u6240\u4F20\u7684\u5168\u90E8\u6280\u827A\u3002"
   itemSprite: {fileID: 0}
   itemVideo: {fileID: 0}
   autoPlay: 1
-  partKey: 
+  partKey: ting
