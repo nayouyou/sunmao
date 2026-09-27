@@ -35,6 +35,11 @@ public class OpeningScene : MonoBehaviour
     public Vector2 envelopeTargetOffset = new Vector2(0f, -320f);
     public float moveDuration = 0.6f;
 
+    [Header("信纸放大（点信封那一下：信纸放大，同时出字）")]
+    public RectTransform letterRect;
+    public float letterStartScale = 0.55f;
+    public float enlargeDuration = 0.7f;
+
     [Header("动画（未导入，Animator 留空即跳过）")]
     public Animator envelopeAnimator;
     public string envelopeOpenTrigger = "open";
@@ -44,6 +49,7 @@ public class OpeningScene : MonoBehaviour
     private enum Stage { Envelope, Letter, Finish }
     private Stage _stage = Stage.Envelope;
     private Coroutine _moveRoutine;
+    private Coroutine _enlargeRoutine;
 
     void Start()
     {
@@ -71,11 +77,11 @@ public class OpeningScene : MonoBehaviour
         }
     }
 
-    /// <summary>点击信封：播放开启动画并向下移出，信纸留在原处</summary>
+    /// <summary>点击信封：信封收起，信纸出现并放大，同时显示信上文字</summary>
     public void OnEnvelopeClicked()
     {
         if (_stage != Stage.Envelope) return;
-        _stage = Stage.Letter;
+        _stage = Stage.Finish;                       // 出字后只要再点一下即可进游戏
 
         if (envelope != null)
         {
@@ -83,36 +89,53 @@ public class OpeningScene : MonoBehaviour
             if (btn != null) btn.interactable = false;
         }
 
-        // 打开信封：信封收起，信纸展开
+        // 打开信封：信封收起，信纸展开 + 出字（同一个点击里完成，不再分两步）
         if (envelope != null) envelope.SetActive(false);
         if (letter != null) letter.SetActive(true);
+        if (letterText != null) letterText.SetActive(true);
+        PlayTrigger(letterAnimator, letterOpenTrigger);
+
+        // 信纸从小放大到原尺寸（文字是信纸的子物体，会跟着一起放大）
+        if (letterRect != null)
+        {
+            letterRect.localScale = Vector3.one * letterStartScale;
+            if (_enlargeRoutine != null) StopCoroutine(_enlargeRoutine);
+            _enlargeRoutine = StartCoroutine(EnlargeLetter());
+        }
 
         SetHint(letterHint);
     }
 
-    /// <summary>点击信纸：播放展开动画并显示信上文字</summary>
+    /// <summary>点击信纸：放大动画结束后再点，进入游戏主场景</summary>
     public void OnLetterClicked()
     {
-        if (_stage != Stage.Letter) return;
-        _stage = Stage.Finish;
+        OnFinishClicked();
+    }
 
-        if (letter != null)
+    IEnumerator EnlargeLetter()
+    {
+        if (letterRect == null) yield break;
+
+        float t = 0f;
+        while (t < enlargeDuration)
         {
-            Button btn = letter.GetComponent<Button>();
-            if (btn != null) btn.interactable = false;
+            t += Time.deltaTime;
+            float k = enlargeDuration > 0f ? Mathf.Clamp01(t / enlargeDuration) : 1f;
+            float eased = 1f - (1f - k) * (1f - k);              // 先快后慢
+            letterRect.localScale = Vector3.one * Mathf.Lerp(letterStartScale, 1f, eased);
+            yield return null;
         }
 
-        PlayTrigger(letterAnimator, letterOpenTrigger);
-
-        if (letterText != null) letterText.SetActive(true);
-        if (fullScreenClick != null) fullScreenClick.SetActive(true);
-        SetHint(finishHint);
+        letterRect.localScale = Vector3.one;
+        _enlargeRoutine = null;
+        if (fullScreenClick != null) fullScreenClick.SetActive(true);   // 放大完就可以点任意处继续
     }
 
     /// <summary>展开后再点击：进入游戏主场景</summary>
     public void OnFinishClicked()
     {
         if (_stage != Stage.Finish) return;
+        if (_enlargeRoutine != null) return;          // 放大动画没播完先不响应，免得一下跳过
 
         // 标记开场对话：进入主场景后由 IntroDialog 自动弹出
         IntroDialog.Pending = true;

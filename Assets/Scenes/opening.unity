@@ -318,11 +318,12 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1832927863}
   m_Father: {fileID: 1883864709}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.15, y: 0.08}
-  m_AnchorMax: {x: 0.85, y: 0.92}
+  m_AnchorMin: {x: 0.12, y: 0.02}
+  m_AnchorMax: {x: 0.88, y: 0.98}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -712,6 +713,9 @@ MonoBehaviour:
   finishHint: "\u70B9\u51FB\u7EE7\u7EED"
   envelopeTargetOffset: {x: 0, y: -320}
   moveDuration: 0.6
+  letterRect: {fileID: 42553318}
+  letterStartScale: 0.55
+  enlargeDuration: 0.7
   envelopeAnimator: {fileID: 19803398}
   envelopeOpenTrigger: open
   letterAnimator: {fileID: 42553317}
@@ -853,12 +857,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1883864709}
+  m_Father: {fileID: 42553318}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.28, y: 0.25}
-  m_AnchorMax: {x: 0.72, y: 0.75}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 76}
+  m_SizeDelta: {x: 500, y: 760}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1832927864
 MonoBehaviour:
@@ -907,12 +911,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 32
+  m_fontSize: 40
   m_fontSizeBase: 32
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 42
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
@@ -990,7 +994,6 @@ RectTransform:
   m_Children:
   - {fileID: 1016587879}
   - {fileID: 42553318}
-  - {fileID: 1832927863}
   - {fileID: 19803399}
   - {fileID: 2031277711}
   - {fileID: 461200754}
