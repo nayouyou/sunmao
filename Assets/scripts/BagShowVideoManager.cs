@@ -30,6 +30,7 @@ public class BagShowVideoManager : MonoBehaviour
 
     // 视频渲染纹理缓存
     private RenderTexture _renderTexture;
+    private Texture2D _stillTexture;      // 无预览视频时，把物品图排成一张与预览框同比例的贴图
     // 背包内置视频播放器
     private VideoPlayer _localVideoPlayer;
     // 当前已占用格子数量
@@ -300,9 +301,82 @@ public class BagShowVideoManager : MonoBehaviour
         // 播放预览视频
         if (target.autoPlay)
         {
+            // 没有预览视频时，用物品图填上（保持比例居中、像素整数倍放大）
             if (target.itemVideo == null)
-                Debug.LogWarning("该物品无预览视频Clip");
-            PlayBagItemVideo(target.itemVideo);
+                ShowBagItemStill(target);
+            else
+                PlayBagItemVideo(target.itemVideo);
+        }
+    }
+
+    /// <summary>
+    /// 没有预览视频时，把物品图放进预览框：按预览框的宽高比生成一张贴图，
+    /// 物品图按整数倍最近邻放大后居中、四周留白，避免被拉变形
+    /// </summary>
+    private void ShowBagItemStill(ItemData item)
+    {
+        if (bagVideoRawImage == null)
+        {
+            Debug.LogError("bagVideoRawImage 视频框未拖拽！");
+            return;
+        }
+        _localVideoPlayer.Stop();
+
+        Sprite sp = item != null ? item.itemSprite : null;
+        if (sp == null || sp.texture == null)
+        {
+            bagVideoRawImage.texture = null;
+            bagVideoRawImage.gameObject.SetActive(false);
+            return;
+        }
+
+        // 预览框在屏幕上的宽高比（含物体缩放）
+        RectTransform rt = bagVideoRawImage.rectTransform;
+        Vector2 area = Vector2.Scale(rt.rect.size, rt.lossyScale);
+        float areaAspect = area.y > 1f ? area.x / area.y : 1.6f;
+        if (float.IsNaN(areaAspect) || areaAspect <= 0f) areaAspect = 1.6f;
+
+        const int H = 512;
+        int W = Mathf.Max(64, Mathf.RoundToInt(H * areaAspect));
+
+        try
+        {
+            Texture2D src = sp.texture;
+            Rect tr = sp.textureRect;
+            int sw = Mathf.RoundToInt(tr.width), sh = Mathf.RoundToInt(tr.height);
+            Color[] srcPixels = src.GetPixels(Mathf.RoundToInt(tr.x), Mathf.RoundToInt(tr.y), sw, sh);
+
+            // 整数倍放大，长边各留 ~14% 余量
+            int scale = Mathf.Max(1, Mathf.Min(Mathf.FloorToInt(W * 0.72f / sw), Mathf.FloorToInt(H * 0.72f / sh)));
+            int dw = sw * scale, dh = sh * scale;
+            int ox = (W - dw) / 2, oy = (H - dh) / 2;
+
+            if (_stillTexture != null) Destroy(_stillTexture);
+            _stillTexture = new Texture2D(W, H, TextureFormat.RGBA32, false);
+            _stillTexture.filterMode = FilterMode.Point;
+
+            Color[] dst = new Color[W * H];
+            for (int i = 0; i < dst.Length; i++) dst[i] = new Color(0f, 0f, 0f, 0f);
+            for (int y = 0; y < dh; y++)
+            {
+                int sy = y / scale;
+                for (int x = 0; x < dw; x++)
+                {
+                    dst[(oy + y) * W + (ox + x)] = srcPixels[sy * sw + (x / scale)];
+                }
+            }
+            _stillTexture.SetPixels(dst);
+            _stillTexture.Apply();
+
+            bagVideoRawImage.gameObject.SetActive(true);
+            bagVideoRawImage.texture = _stillTexture;
+        }
+        catch (System.Exception e)
+        {
+            // 物品图没开 Read/Write 时退回直接显示（会被拉伸）
+            Debug.LogWarning($"物品图无法读取像素（请把 {sp.texture.name} 的 Read/Write 打开）：{e.Message}");
+            bagVideoRawImage.gameObject.SetActive(true);
+            bagVideoRawImage.texture = sp.texture;
         }
     }
 
@@ -350,6 +424,11 @@ public class BagShowVideoManager : MonoBehaviour
         {
             bagVideoRawImage.texture = null;
             bagVideoRawImage.gameObject.SetActive(false);
+        }
+        if (_stillTexture != null)
+        {
+            Destroy(_stillTexture);
+            _stillTexture = null;
         }
         if (itemPreviewPanel != null)
             itemPreviewPanel.SetActive(false);
