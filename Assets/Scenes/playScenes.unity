@@ -7166,6 +7166,7 @@ MonoBehaviour:
   unlockItem: {fileID: 11400000, guid: 4ce509a36207d914ba4577d2b7122ad2, type: 2}
   unlockVideo: {fileID: 32900000, guid: aa423a4e442892240bb4f5d3d91964ad, type: 3}
   dialogText: "\u5728\u89C2\u5BDF\u4E86\u5404\u79CD\u69AB\u536F\u7ED3\u6784\u4E4B\u540E\uFF0C\u4F60\u6709\u4E86\u65B0\u7684\u9886\u609F"
+  afterUnlockText: "\u770B\u6765\u662F\u4FEE\u590D\u4EAD\u5B50\u7684\u5173\u952E"
 --- !u!114 &2046624051
 MonoBehaviour:
   m_ObjectHideFlags: 0

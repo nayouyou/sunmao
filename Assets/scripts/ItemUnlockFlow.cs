@@ -26,6 +26,10 @@ public class ItemUnlockFlow : MonoBehaviour
     [Header("解锁动画（可为空，为空时确认后直接发放）")]
     public VideoClip unlockVideo;
 
+    [Header("发放之后的心理活动（留空=不显示；Q/E 关闭）")]
+    [TextArea]
+    public string afterUnlockText;
+
     [Header("对话文案（留空=空对话）")]
     [TextArea]
     public string dialogText;
@@ -38,6 +42,7 @@ public class ItemUnlockFlow : MonoBehaviour
     private RenderTexture _renderTexture;
 
     private bool _isDialogShowing = false;
+    private bool _isAfterDialog = false;   // 正在显示"发放后的心理活动"
     private bool _isPlayingVideo = false;
 
     private void Awake()
@@ -92,6 +97,13 @@ public class ItemUnlockFlow : MonoBehaviour
         // 获得斗拱的对话是事件提示（不是可选操作），Q / E 均视为继续
         if (Input.GetKeyDown(GameKeys.DialogConfirm) || Input.GetKeyDown(GameKeys.DialogCancel))
         {
+            // 发放后的心理活动：关掉就结束，不再往下走
+            if (_isAfterDialog)
+            {
+                _isAfterDialog = false;
+                HideDialog();
+                return;
+            }
             HideDialog();
             StartUnlock();
         }
@@ -203,6 +215,16 @@ public class ItemUnlockFlow : MonoBehaviour
 
         if (HintManager.Instance != null)
             HintManager.Instance.ShowHint("已解锁新物品，按Tab打开背包查看");
+
+        // 发放完再补一句心理活动（留空则不显示）
+        if (!string.IsNullOrEmpty(afterUnlockText) && _dialogBox != null && _dialogTipText != null)
+        {
+            _isAfterDialog = true;
+            _isDialogShowing = true;
+            _dialogBox.SetActive(true);
+            Canvas.ForceUpdateCanvases();
+            _dialogTipText.text = afterUnlockText;
+        }
     }
 
     private void OnDestroy()
